@@ -1,0 +1,12 @@
+[submodule "external/poco"]
+	path = external/poco
+	url = https://github.com/peterpuhov-github/poco.git
+[submodule "external/aws-c-common"]
+	path = external/aws-c-common
+	url = https://github.com/peterpuhov-github/aws-c-common.git
+[submodule "external/aws-checksums"]
+	path = external/aws-checksums
+	url = https://github.com/peterpuhov-github/aws-checksums.git
+[submodule "external/aws-c-event-stream"]
+	path = external/aws-c-event-stream
+	url = https://github.com/peterpuhov-github/aws-c-event-stream.git
