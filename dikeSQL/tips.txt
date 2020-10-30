@@ -1,0 +1,1 @@
+./build/Release/dikeSQL 3 /mnt/usb-SanDisk_Ultra_128GB/dike/minio/data/tpch-test/lineitem.tbl "SELECT * FROM S3Object LIMIT 1000 OFFSET 6001210"
