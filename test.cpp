@@ -22,7 +22,6 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <memory.h>
-#include <assert.h>
 
 #include <sqlite3.h>
 #include <stdio.h>
@@ -31,10 +30,6 @@ extern "C" {
 extern int sqlite3_csv_init(sqlite3 *db, char **pzErrMsg, const sqlite3_api_routines *pApi);
 extern int sqlite3_tbl_init(sqlite3 *db, char **pzErrMsg, const sqlite3_api_routines *pApi);
 }
-
-#  define DIKE_ALWAYS_INLINE  __attribute__((always_inline)) inline
-#  define DIKE_LIKELY(x)      __builtin_expect(!!(x), 1)
-#  define DIKE_UNLIKELY(x)    __builtin_expect(!!(x), 0)
 
 using namespace Poco::Net;
 using namespace Poco::Util;
@@ -55,8 +50,33 @@ const char ERROR_CODE_HEADER[] = ":error-code";
 const char ERROR_MESSAGE_HEADER[] = ":error-message";
 const char EXCEPTION_TYPE_HEADER[] = ":exception-type";
 
-static DIKE_ALWAYS_INLINE int aws_event_stream_message_update_crc(struct aws_event_stream_message *message, uint32_t payload_len);
+int SendPayload(ostream& outStream, const char * data, int len)
+{
+  return 0;
 
+  struct aws_array_list headers;
+  struct aws_allocator *alloc = aws_default_allocator();
+  struct aws_event_stream_message msg;    
+  struct aws_byte_buf payload = aws_byte_buf_from_array(data, len);
+  
+  aws_event_stream_headers_list_init(&headers, alloc);        
+  aws_event_stream_add_string_header(&headers, MESSAGE_TYPE_HEADER, sizeof(MESSAGE_TYPE_HEADER) - 1, MESSAGE_TYPE_EVENT, sizeof(MESSAGE_TYPE_EVENT) - 1, 0);
+  aws_event_stream_add_string_header(&headers, CONTENT_TYPE_HEADER, sizeof(CONTENT_TYPE_HEADER) - 1, CONTENT_TYPE_OCTET_STREAM, sizeof(CONTENT_TYPE_OCTET_STREAM) - 1, 0);
+  aws_event_stream_add_string_header(&headers, EVENT_TYPE_HEADER, sizeof(EVENT_TYPE_HEADER) - 1, EVENT_TYPE_RECORDS, sizeof(EVENT_TYPE_RECORDS) - 1, 0);
+
+  // This is doing memcopy
+  //aws_event_stream_message_init(&msg, alloc, &headers, &payload);
+
+  //outStream.write((const char *)aws_event_stream_message_buffer(&msg), aws_event_stream_message_total_length(&msg));  
+
+  
+  //aws_event_stream_message_clean_up(&msg);
+
+  aws_event_stream_headers_list_cleanup(&headers);
+  aws_byte_buf_clean_up(&payload);
+
+  return 0;
+}
 int SendCont(ostream& outStream)
 {  
   struct aws_array_list headers;
@@ -91,63 +111,86 @@ int SendEnd(ostream& outStream)
   return 0;
 }
 
+
 class DikeByteBuffer
 {
-  const int DIKE_BYTE_BUFFER_SIZE = 127<<10; 
+  const int DIKE_BYTE_BUFFER_SIZE = 64<<10; 
   
   public:
     DikeByteBuffer() 
-    {      
+    {
+      m_Buffer = (char*) malloc(DIKE_BYTE_BUFFER_SIZE);
+      memset(m_Buffer, 0, DIKE_BYTE_BUFFER_SIZE);      
+      m_Pos = 0;
       struct aws_array_list headers;
       struct aws_allocator *alloc = aws_default_allocator();
       struct aws_event_stream_message msg;
-      
+      struct aws_byte_buf payload = aws_byte_buf_from_array(m_Buffer, DIKE_BYTE_BUFFER_SIZE);
       aws_event_stream_headers_list_init(&headers, alloc);        
       aws_event_stream_add_string_header(&headers, MESSAGE_TYPE_HEADER, sizeof(MESSAGE_TYPE_HEADER) - 1, MESSAGE_TYPE_EVENT, sizeof(MESSAGE_TYPE_EVENT) - 1, 0);
       aws_event_stream_add_string_header(&headers, CONTENT_TYPE_HEADER, sizeof(CONTENT_TYPE_HEADER) - 1, CONTENT_TYPE_OCTET_STREAM, sizeof(CONTENT_TYPE_OCTET_STREAM) - 1, 0);
       aws_event_stream_add_string_header(&headers, EVENT_TYPE_HEADER, sizeof(EVENT_TYPE_HEADER) - 1, EVENT_TYPE_RECORDS, sizeof(EVENT_TYPE_RECORDS) - 1, 0);  
-      
-      aws_event_stream_message_init(&msg, alloc, &headers, NULL);
+      aws_event_stream_message_init(&msg, alloc, &headers, &payload);
 
-      m_MsgLen = aws_event_stream_message_total_length(&msg);
-      m_Msg.alloc = NULL;      
-      m_Msg.message_buffer = (uint8_t *)aligned_alloc(128, m_MsgLen + DIKE_BYTE_BUFFER_SIZE);
+      m_Msg.alloc = NULL;
+      m_Msg.message_buffer = (uint8_t *)malloc(aws_event_stream_message_total_length(&msg));
       m_Msg.owns_buffer = 1;
-
-      memcpy(m_Msg.message_buffer, aws_event_stream_message_buffer(&msg), m_MsgLen);
+      memcpy(m_Msg.message_buffer, aws_event_stream_message_buffer(&msg), aws_event_stream_message_total_length(&msg));
       aws_event_stream_message_clean_up(&msg);
 
       m_Payload = ( uint8_t *)aws_event_stream_message_payload(&m_Msg);
-      m_Pos = 0;
+      aws_event_stream_headers_list_cleanup(&headers);
+      cout << "Payload offset " << m_Payload - aws_event_stream_message_buffer(&m_Msg) << endl;
+
+      cout << aws_event_stream_message_message_crc(&m_Msg) << endl;
+      cout << aws_event_stream_message_headers_len(&m_Msg) << endl;
+      cout << aws_event_stream_message_total_length(&m_Msg) << endl;
+      cout << aws_event_stream_message_payload_len(&m_Msg) << endl;     
+      
+      aws_event_stream_message_init_crc(&m_Msg, DIKE_BYTE_BUFFER_SIZE -1 );
+
+      cout << aws_event_stream_message_message_crc(&m_Msg) << endl;
+      cout << aws_event_stream_message_headers_len(&m_Msg)<< endl;
+      cout << aws_event_stream_message_total_length(&m_Msg) << endl;
+      cout << aws_event_stream_message_payload_len(&m_Msg) << endl;     
+      
     }
 
     ~DikeByteBuffer(){
-      free(m_Msg.message_buffer);      
+      free(m_Msg.message_buffer);
+      free(m_Buffer);
     }
 
     void Write(ostream& outStream, const char * buf, int len){
       // 9.0       
       if(m_Pos + len > DIKE_BYTE_BUFFER_SIZE){
-        //SendCont(outStream);
-        aws_event_stream_message_update_crc(&m_Msg, m_Pos);
-        outStream.write((const char *)(m_Msg.message_buffer) , m_MsgLen + m_Pos);
+        SendCont(outStream);
+        //SendPayload(outStream, m_Buffer, m_Pos);        
+        aws_event_stream_message_init_crc(&m_Msg, m_Pos);
+        outStream.write((const char *)aws_event_stream_message_buffer(&m_Msg), aws_event_stream_message_total_length(&m_Msg));
         m_Pos = 0;
       }
-      memcpy(m_Payload + m_Pos, buf, len); // This cost 0.8 sec
+      //memcpy(m_Payload + m_Pos, buf, len); // This cost 0.8 sec
       m_Pos += len;
     }
 
-    void Flush(ostream& outStream) {      
-      aws_event_stream_message_update_crc(&m_Msg, m_Pos);      
-      outStream.write((const char *)(m_Msg.message_buffer), m_MsgLen + m_Pos);
+    void Flush(ostream& outStream) {
+      cout << "Writing " << m_Pos << " Bytes " << endl;
+      cout << "Payload offset " << m_Payload - aws_event_stream_message_buffer(&m_Msg) << endl;
+      //aws_event_stream_message_init_crc(&m_Msg, m_Pos);
+      aws_event_stream_message_init_crc(&m_Msg, DIKE_BYTE_BUFFER_SIZE);
+      cout << aws_event_stream_message_message_crc(&m_Msg) << endl;
+      cout << aws_event_stream_message_headers_len(&m_Msg)<< endl;
+
+      outStream.write((const char *)aws_event_stream_message_buffer(&m_Msg), aws_event_stream_message_total_length(&m_Msg));
       m_Pos = 0;
     }
 
-  private:    
+  private:
+    char * m_Buffer;
     int m_Pos;
     struct aws_event_stream_message m_Msg;
     uint8_t *m_Payload;
-    int m_MsgLen;
 };
 
 class SelectObjectContentHandler : public HTTPRequestHandler
@@ -247,16 +290,19 @@ public:
         return;
     }            
 
-    int records = 0;
-    while ( (rc = sqlite3_step(sqlRes)) == SQLITE_ROW) {      
+
+    while ( (rc = sqlite3_step(sqlRes)) == SQLITE_ROW) {
+      // 5.5 sec
       int data_count = sqlite3_data_count(sqlRes);
+      // 5.6 sec
       
       for(int i = 0; i < data_count; i++) {
           const char* text = (const char*)sqlite3_column_text(sqlRes, i);
-             
+          // 7.07 sec          
+
           if(text){
             int len = strlen(text);
-            if(DIKE_UNLIKELY(strchr(text,','))){
+            if(strchr(text,',')){
                 dbb.Write(outStream, "\"", 1);
                 dbb.Write(outStream, text, len);
                 dbb.Write(outStream, "\"", 1);
@@ -268,16 +314,14 @@ public:
           }
           if(i < data_count -1) {                  
               dbb.Write(outStream,",", 1);
-          }          
+          }
+          // 7.11 
       }
-      dbb.Write(outStream,"\n", 1);
-      if(records%1000000 == 0){
-        SendCont(outStream);
-      }
-      records++;
-    }
+      dbb.Write(outStream,"\n", 1); 
+    }    
 
     dbb.Flush(outStream);
+
 
     SendEnd(outStream);
     outStream.flush();
@@ -320,38 +364,42 @@ protected:
 };
 
 int main(int argc, char** argv)
-{  
-  MyServerApp app;
-  return app.run(argc, argv);
-}
-
-
-static int aws_event_stream_message_update_crc(
-    struct aws_event_stream_message *message,
-    uint32_t payload_len) 
 {
-    uint32_t total_length = 0;
-    uint32_t headers_length = aws_event_stream_message_headers_len(message);    
-    
-    total_length =
-        (uint32_t)(AWS_EVENT_STREAM_PRELUDE_LENGTH + headers_length + payload_len + AWS_EVENT_STREAM_TRAILER_LENGTH);
-         
-    aws_write_u32(total_length, message->message_buffer);
-    uint8_t *buffer_offset = message->message_buffer + sizeof(total_length);
-    aws_write_u32(headers_length, buffer_offset);   
-    buffer_offset += sizeof(headers_length);
-   
-    uint32_t running_crc = aws_checksums_crc32(message->message_buffer, (int)(buffer_offset - message->message_buffer), 0);
+  char * m_Buffer = (char*) malloc(4);
+  memset(m_Buffer, 0, 4);      
+  int m_Pos = 0;
+  struct aws_array_list headers;
+  struct aws_allocator *alloc = aws_default_allocator();
+  struct aws_event_stream_message msg;
+  struct aws_event_stream_message m_Msg;
+  struct aws_byte_buf payload = aws_byte_buf_from_array(m_Buffer, 4);
 
-    const uint8_t *message_crc_boundary_start = buffer_offset;
-    aws_write_u32(running_crc, buffer_offset);
+  aws_event_stream_headers_list_init(&headers, alloc);        
+  aws_event_stream_add_string_header(&headers, MESSAGE_TYPE_HEADER, sizeof(MESSAGE_TYPE_HEADER) - 1, MESSAGE_TYPE_EVENT, sizeof(MESSAGE_TYPE_EVENT) - 1, 0);
+  aws_event_stream_add_string_header(&headers, CONTENT_TYPE_HEADER, sizeof(CONTENT_TYPE_HEADER) - 1, CONTENT_TYPE_OCTET_STREAM, sizeof(CONTENT_TYPE_OCTET_STREAM) - 1, 0);
+  aws_event_stream_add_string_header(&headers, EVENT_TYPE_HEADER, sizeof(EVENT_TYPE_HEADER) - 1, EVENT_TYPE_RECORDS, sizeof(EVENT_TYPE_RECORDS) - 1, 0);
+  aws_event_stream_message_init(&msg, alloc, &headers, &payload);
 
-    buffer_offset = message->message_buffer + AWS_EVENT_STREAM_PRELUDE_LENGTH + headers_length;    
-    buffer_offset += payload_len;
+  m_Msg.alloc = NULL;
+  m_Msg.message_buffer = (uint8_t *)malloc(aws_event_stream_message_total_length(&msg));
+  m_Msg.owns_buffer = 1;
+  memcpy(m_Msg.message_buffer, aws_event_stream_message_buffer(&msg), aws_event_stream_message_total_length(&msg));
+  aws_event_stream_message_clean_up(&msg);
 
-    running_crc = aws_checksums_crc32(
-        message_crc_boundary_start, (int)(buffer_offset - message_crc_boundary_start), running_crc);
-    aws_write_u32(running_crc, buffer_offset);
+  uint8_t * m_Payload = ( uint8_t *)aws_event_stream_message_payload(&m_Msg);
+  aws_event_stream_headers_list_cleanup(&headers);
 
-    return AWS_OP_SUCCESS;
+  cout << "Payload offset " << m_Payload - aws_event_stream_message_buffer(&m_Msg) << endl;
+
+  cout << aws_event_stream_message_message_crc(&m_Msg) << endl;
+  cout << aws_event_stream_message_headers_len(&m_Msg) << endl;
+  cout << aws_event_stream_message_total_length(&m_Msg) << endl;
+  cout << aws_event_stream_message_payload_len(&m_Msg) << endl;     
+  
+  aws_event_stream_message_init_crc(&m_Msg, 4 -1 );
+
+  cout << aws_event_stream_message_message_crc(&m_Msg) << endl;
+  cout << aws_event_stream_message_headers_len(&m_Msg)<< endl;
+  cout << aws_event_stream_message_total_length(&m_Msg) << endl;
+  cout << aws_event_stream_message_payload_len(&m_Msg) << endl;     
 }

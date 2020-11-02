@@ -24,3 +24,23 @@ target_link_libraries(dikeCS PUBLIC
     "-lpthread -lm"
     "-L${CMAKE_SOURCE_DIR}/external/build-aws/lib -laws-c-event-stream  -laws-checksums -laws-c-common"
     )
+
+if(FALSE) # fake a block comment
+    add_executable(test test.cpp)
+
+    target_include_directories(test PUBLIC 
+        ${CMAKE_SOURCE_DIR}/external/poco/Foundation/include 
+        ${CMAKE_SOURCE_DIR}/external/poco/Util/include
+        ${CMAKE_SOURCE_DIR}/external/poco/Net/include 
+        ${CMAKE_SOURCE_DIR}/external/build-aws-debug/include
+        )
+
+    target_link_libraries(test PUBLIC 
+        Poco::Foundation
+        Poco::Util
+        Poco::Net
+        libsqlite
+        "-lpthread -lm"
+        "-L${CMAKE_SOURCE_DIR}/external/build-aws-debug/lib -laws-c-event-stream  -laws-checksums -laws-c-common"
+        )
+endif()
