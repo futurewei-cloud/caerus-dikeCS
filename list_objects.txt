@@ -1,0 +1,100 @@
+
+172.18.0.2 [REQUEST s3.ListObjectsV2] 16:10:44.819
+172.18.0.2 GET /tpch-test/?list-type=2&max-keys=1024&fetch-owner=false
+172.18.0.2 Proto: HTTP/1.1
+172.18.0.2 Host: 172.18.0.2:9000
+172.18.0.2 User-Agent: aws-sdk-java/1.11.869 Linux/5.4.0-52-generic OpenJDK_64-Bit_Server_VM/25.265-b01 java/1.8.0_265 vendor/Oracle_Corporation
+172.18.0.2 X-Amz-Date: 20201102T161044Z
+172.18.0.2 Amz-Sdk-Request: attempt=1;max=4
+172.18.0.2 Amz-Sdk-Retry: 0/0/500
+172.18.0.2 Connection: Keep-Alive
+172.18.0.2 Content-Type: application/octet-stream
+172.18.0.2 Amz-Sdk-Invocation-Id: 090fbac9-bce0-443e-601b-6a007b7ca46e
+172.18.0.2 Authorization: AWS4-HMAC-SHA256 Credential=admin/20201102/us-east-1/s3/aws4_request, SignedHeaders=amz-sdk-invocation-id;amz-sdk-request;amz-sdk-retry;content-type;host;user-agent;x-amz-content-sha256;x-amz-date, Signature=3b3f51ce8e9ca83ada65a210debc88d2870ed3e5b71985e3f06630cc9a73400e
+172.18.0.2 Content-Length: 0
+172.18.0.2 X-Amz-Content-Sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+172.18.0.2 
+172.18.0.2 [RESPONSE] [16:10:44.819] [ Duration 2.957ms  ↑ 153 B  ↓ 3.8 KiB ]
+172.18.0.2 200 OK
+172.18.0.2 Content-Length: 3667
+172.18.0.2 Content-Security-Policy: block-all-mixed-content
+172.18.0.2 Content-Type: application/xml
+172.18.0.2 Server: MinIO/DEVELOPMENT.2020-10-16T18-15-32Z
+172.18.0.2 Vary: Origin
+172.18.0.2 X-Amz-Request-Id: 1643BCC497947CB8
+172.18.0.2 X-Xss-Protection: 1; mode=block
+172.18.0.2 Accept-Ranges: bytes
+172.18.0.2 <?xml version="1.0" encoding="UTF-8"?>
+<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+<Name>tpch-test</Name>
+<Prefix></Prefix>
+<KeyCount>13</KeyCount>
+<MaxKeys>1024</MaxKeys>
+<Delimiter></Delimiter>
+<IsTruncated>false</IsTruncated>
+<Contents>
+    <Key>5m-Sales-Records.csv</Key>
+    <LastModified>2020-09-10T21:18:38.000Z</LastModified>
+    <ETag>&#34;00000000000000000000000000000000-1&#34;</ETag>
+    <Size>624001733</Size>
+    <Owner>
+    <ID></ID>
+    <DisplayName></DisplayName>
+    </Owner>
+    <StorageClass>STANDARD</StorageClass>
+</Contents>
+<Contents>
+    <Key>TotalPopulation.csv</Key>
+    <LastModified>2020-09-04T14:35:34.371Z</LastModified>
+    <ETag>&#34;00000000000000000000000000000000-1&#34;</ETag>
+    <Size>22383021</Size>
+    <Owner><ID></ID><DisplayName></DisplayName></Owner>
+    <StorageClass>STANDARD</StorageClass>
+</Contents>
+<Contents><Key>customer.csv</Key><LastModified>2020-10-19T12:14:14.838Z</LastModified><ETag>&#34;06df3d4c692c673f0d745cf9135625a4&#34;</ETag><Size>24304398</Size><Owner><ID></ID><DisplayName></DisplayName></Owner><StorageClass>STANDARD</StorageClass></Contents><Contents><Key>lineitem.csv</Key><LastModified>2020-10-19T12:14:15.658Z</LastModified><ETag>&#34;b0915a030cadd891fd3cc288558f8279-6&#34;</ETag><Size>762032328</Size><Owner><ID></ID><DisplayName></DisplayName></Owner><StorageClass>STANDARD</StorageClass></Contents><Contents><Key>lineitem.schema</Key><LastModified>2020-10-30T11:25:22.419Z</LastModified><ETag>&#34;00000000000000000000000000000000-1&#34;</ETag><Size>203</Size><Owner><ID></ID><DisplayName></DisplayName></Owner><StorageClass>STANDARD</StorageClass></Contents><Contents><Key>lineitem.tbl</Key><LastModified>2020-10-27T17:44:12.056Z</LastModified><ETag>&#34;00000000000000000000000000000000-1&#34;</ETag><Size>759863287</Size><Owner><ID></ID><DisplayName></DisplayName></Owner><StorageClass>STANDARD</StorageClass></Contents><Contents><Key>nation.csv</Key><LastModified>2020-10-19T12:14:16.270Z</LastModified><ETag>&#34;9e0c5f04f3172730981e8df8e40d1c4e&#34;</ETag><Size>2247</Size><Owner><ID></ID><DisplayName></DisplayName></Owner><StorageClass>STANDARD</StorageClass></Contents><Contents><Key>order.csv</Key><LastModified>2020-10-19T12:14:16.462Z</LastModified><ETag>&#34;00000000000000000000000000000000-1&#34;</ETag><Size>170405392</Size><Owner><ID></ID><DisplayName></DisplayName></Owner><StorageClass>STANDARD</StorageClass></Contents><Contents><Key>orders.csv</Key><LastModified>2020-09-30T16:32:12.963Z</LastModified><ETag>&#34;64fc786f1287b189007e1b829adca1a0-2&#34;</ETag><Size>168952278</Size><Owner><ID></ID><DisplayName></DisplayName></Owner><StorageClass>STANDARD</StorageClass></Contents><Contents><Key>part.csv</Key><LastModified>2020-10-19T12:14:16.602Z</LastModified><ETag>&#34;185a2c153546811e92750c2f5b70ed75&#34;</ETag><Size>23881484</Size><Owner><ID></ID><DisplayName></DisplayName></Owner><StorageClass>STANDARD</StorageClass></Contents><Contents><Key>partsupp.csv</Key><LastModified>2020-10-19T12:14:16.730Z</LastModified><ETag>&#34;f4aef11f2ddfccfa7d2b83ac062cf12e&#34;</ETag><Size>118482844</Size><Owner><ID></ID><DisplayName></DisplayName></Owner><StorageClass>STANDARD</StorageClass></Contents><Contents><Key>region.csv</Key><LastModified>2020-10-19T12:14:16.798Z</LastModified><ETag>&#34;720660b1676cd5b048af4d45d25d5627&#34;</ETag><Size>414</Size><Owner><ID></ID><DisplayName></DisplayName></Owner><StorageClass>STANDARD</StorageClass></Contents><Contents><Key>supplier.csv</Key><LastModified>2020-10-19T12:14:16.802Z</LastModified><ETag>&#34;9e4ee7521d50e9dfbf70d74c5009588f&#34;</ETag><Size>1405821</Size><Owner><ID></ID><DisplayName></DisplayName></Owner><StorageClass>STANDARD</StorageClass></Contents></ListBucketResult>
+
+
+
+# With Prefix
+172.18.0.2 [REQUEST s3.ListObjectsV2] 21:06:16.826
+172.18.0.2 GET /tpch-test/?list-type=2&max-keys=1024&prefix=lineitem.tbl&fetch-owner=false
+172.18.0.2 Proto: HTTP/1.1
+172.18.0.2 Host: 172.18.0.2:9000
+172.18.0.2 X-Amz-Content-Sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+172.18.0.2 X-Amz-Date: 20201102T210616Z
+172.18.0.2 Amz-Sdk-Request: attempt=1;max=4
+172.18.0.2 Amz-Sdk-Retry: 0/0/500
+172.18.0.2 Content-Length: 0
+172.18.0.2 Content-Type: application/octet-stream
+172.18.0.2 User-Agent: aws-sdk-java/1.11.869 Linux/5.4.0-52-generic OpenJDK_64-Bit_Server_VM/25.265-b01 java/1.8.0_265 vendor/Oracle_Corporation
+172.18.0.2 Amz-Sdk-Invocation-Id: 8e777a74-a185-8d92-0e28-bde831ac54d6
+172.18.0.2 Authorization: AWS4-HMAC-SHA256 Credential=admin/20201102/us-east-1/s3/aws4_request, SignedHeaders=amz-sdk-invocation-id;amz-sdk-request;amz-sdk-retry;content-type;host;user-agent;x-amz-content-sha256;x-amz-date, Signature=63537b6b46e0f1f20e58749d98b15af33e2d5c3d1801839e654afc332ab26c92
+172.18.0.2 Connection: Keep-Alive
+172.18.0.2 
+172.18.0.2 [RESPONSE] [21:06:16.826] [ Duration 597µs  ↑ 153 B  ↓ 793 B ]
+172.18.0.2 200 OK
+172.18.0.2 Content-Length: 539
+172.18.0.2 Content-Security-Policy: block-all-mixed-content
+172.18.0.2 Content-Type: application/xml
+172.18.0.2 Server: MinIO/DEVELOPMENT.2020-10-16T18-15-32Z
+172.18.0.2 Vary: Origin
+172.18.0.2 X-Amz-Request-Id: 1643CCE525B55EED
+172.18.0.2 X-Xss-Protection: 1; mode=block
+172.18.0.2 Accept-Ranges: bytes
+172.18.0.2 <?xml version="1.0" encoding="UTF-8"?>
+<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+<Name>tpch-test</Name>
+<Prefix>lineitem.tbl</Prefix>
+<KeyCount>1</KeyCount>
+<MaxKeys>1024</MaxKeys>
+<Delimiter></Delimiter>
+<IsTruncated>false</IsTruncated>
+<Contents>
+<Key>lineitem.tbl</Key>
+<LastModified>2020-10-27T17:44:12.056Z</LastModified>
+<ETag>&#34;00000000000000000000000000000000-1&#34;</ETag>
+<Size>759863287</Size>
+<Owner><ID></ID><DisplayName></DisplayName></Owner>
+<StorageClass>STANDARD</StorageClass></Contents></ListBucketResult>
+
+

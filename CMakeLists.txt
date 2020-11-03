@@ -7,7 +7,7 @@ add_subdirectory(dikeSQL)
 include_directories(dikeSQL)
 
 project(dikeS3)
-add_executable(dikeCS dikeCS.cpp)
+add_executable(dikeCS dikeCS.cpp SelectObjectContent.cpp ListObjectsV2.cpp)
 
 target_include_directories(dikeCS PUBLIC 
     ${CMAKE_SOURCE_DIR}/external/poco/Foundation/include 
