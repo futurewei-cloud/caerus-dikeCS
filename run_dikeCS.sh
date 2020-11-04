@@ -5,6 +5,6 @@ docker run -it --rm  \
 -v "$(pwd)/build/Release/"://usr/local/bin \
 -v "$(pwd)/../minio/data":/data \
 --network dike-net \
---name dikeCS \
+--name minioserver \
 ubuntu:20.04 dikeCS
 #ubuntu:20.04 "$@"

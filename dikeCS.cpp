@@ -23,10 +23,10 @@ class DikeRequestHandlerFactory : public HTTPRequestHandlerFactory {
 public:
   virtual HTTPRequestHandler* createRequestHandler(const HTTPServerRequest & req) {
     cout << req.getURI() << endl;
-    if(string::npos != req.getURI().find("?list-type=2&")){
+    if(string::npos != req.getURI().find("list-type=2&")){
       return new ListObjectsV2;
     }
-    if(string::npos != req.getURI().find("?select&")){
+    if(string::npos != req.getURI().find("select&select-type=2")){
       return new SelectObjectContent;
     }
     return NULL;

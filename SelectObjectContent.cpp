@@ -210,7 +210,12 @@ void SelectObjectContent::handleRequest(Poco::Net::HTTPServerRequest &req, Poco:
     }
 
     string dataPath = "/data";
-    string sqlFileName = dataPath + req.getURI().substr(0, req.getURI().find("?"));
+    string uri = req.getURI();
+    size_t pos = uri.find("%2F");
+    if(pos != string::npos){
+        uri.replace(pos,3, "/");
+    }
+    string sqlFileName = dataPath + uri.substr(0, uri.find("?"));
 
     cout << sqlFileName << endl;
 
