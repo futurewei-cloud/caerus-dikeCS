@@ -22,10 +22,14 @@ using namespace std;
 class DikeRequestHandlerFactory : public HTTPRequestHandlerFactory {
 public:
   virtual HTTPRequestHandler* createRequestHandler(const HTTPServerRequest & req) {
+    cout << req.getURI() << endl;
     if(string::npos != req.getURI().find("?list-type=2&")){
       return new ListObjectsV2;
     }
-    return new SelectObjectContent;
+    if(string::npos != req.getURI().find("?select&")){
+      return new SelectObjectContent;
+    }
+    return NULL;
   }
 };
 

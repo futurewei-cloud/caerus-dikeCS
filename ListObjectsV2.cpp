@@ -28,6 +28,8 @@ using namespace Poco::Util;
 using namespace Poco::XML;
 using namespace std;
 
+#define FNAME_MAX 80
+#define TSTAMP_MAX 40
 void ListObjectsV2::handleRequest(HTTPServerRequest &req, HTTPServerResponse &resp)
 {
     stringstream xmlstream;
@@ -45,8 +47,7 @@ void ListObjectsV2::handleRequest(HTTPServerRequest &req, HTTPServerResponse &re
     //cout << req.getURI() << endl;
     next_pos = req.getURI().find("?", pos);
     args["Name"] = req.getURI().substr(pos, next_pos - pos);
-    pos = next_pos + 1;
-    //cout << args["Name"] << endl;
+    pos = next_pos + 1;    
 
     do {
         next_pos = req.getURI().find("=", pos);
@@ -74,13 +75,18 @@ void ListObjectsV2::handleRequest(HTTPServerRequest &req, HTTPServerResponse &re
     DIR *pDir;
     string dir_path = dataPath + args["Name"];
     struct content {
-        string name;
+        char name[FNAME_MAX];
         size_t size;
-        string lastModified;
+        char lastModified[TSTAMP_MAX];
     };
+        
     struct content * contents = (struct content *)malloc(sizeof(struct content) * stoi(args["max-keys"]));
-    int KeyCount = 0;    
+    if(contents == NULL) {
+        cout << "Failed to allocate memory" << endl;
+    }
 
+    int KeyCount = 0;    
+    
     pDir = opendir(dir_path.c_str());    
     if (pDir == NULL) {
         cout << "Can't open " << dir_path.c_str() << endl;
@@ -90,30 +96,30 @@ void ListObjectsV2::handleRequest(HTTPServerRequest &req, HTTPServerResponse &re
         if(pDirent->d_type != DT_REG) {
             continue;
         }        
-
-        struct stat s;
         string name = pDirent->d_name;
+
         if(name.rfind(args["prefix"],0) != 0){
             continue;
         }
 
-        string p = dir_path + pDirent->d_name;
+        struct stat s;                
+        string p = dir_path + name;        
         if( stat( p.c_str() , &s) == 0 ) {
-            if( s.st_mode & S_IFREG ) {
-                contents[KeyCount].name = name;
-                contents[KeyCount].size = s.st_size;
-
-                std::tm * ptm = std::localtime(&s.st_mtim.tv_sec);
-                char buffer[80];
-
+            if( s.st_mode & S_IFREG ) {                
+                strcpy(contents[KeyCount].name, name.c_str());                                
+                contents[KeyCount].size = s.st_size;    
+                
+                struct tm tms;
+                localtime_r(&s.st_mtim.tv_sec, &tms);                
                 // 2020-10-27T17:44:12.056Z
-                std::strftime(buffer, 80, "%Y-%m-%dT%H:%M:%S.056Z", ptm);
-                contents[KeyCount].lastModified = string(buffer);
-
+                std::strftime(contents[KeyCount].lastModified, TSTAMP_MAX, "%Y-%m-%dT%H:%M:%S.056Z", &tms);
+                
+                /*
                 cout << contents[KeyCount].name << endl;
                 cout << contents[KeyCount].lastModified << endl;
                 cout << to_string(contents[KeyCount].size) << endl;
-
+                */
+                
                 KeyCount++;
             }
         }
@@ -150,13 +156,14 @@ void ListObjectsV2::handleRequest(HTTPServerRequest &req, HTTPServerResponse &re
 
         // Loop starts here
         for(int i = 0; i < KeyCount; i++) {
+            /*
             cout << contents[i].name << endl;
             cout << contents[i].lastModified << endl;
             cout << to_string(contents[i].size) << endl;
-
+            */
             writer.startElement("", "", XMLString("Contents"));
                 writer.startElement("", "", XMLString("Key"));
-                writer.characters(contents[i].name);    
+                writer.characters(XMLString(contents[i].name));
                 writer.endElement("", "", XMLString("Key"));
 
                 writer.startElement("", "", XMLString("LastModified"));
@@ -194,7 +201,7 @@ void ListObjectsV2::handleRequest(HTTPServerRequest &req, HTTPServerResponse &re
     writer.endElement("", "", XMLString("ListBucketResult"));
 
     writer.endDocument();
-    cout << xmlstream.str() << endl;
+    //cout << xmlstream.str() << endl;
 
     resp.setStatus(HTTPResponse::HTTP_OK);    
     resp.setContentType("application/xml");    
