@@ -45,10 +45,18 @@ void ListObjectsV2::handleRequest(HTTPServerRequest &req, HTTPServerResponse &re
     string dataPath = "/data";
 
     //cout << req.getURI() << endl;
-    next_pos = req.getURI().find("?", pos);
-    args["Name"] = req.getURI().substr(pos, next_pos - pos);
-    pos = next_pos + 1;    
+    //  /tpch-test/?list-type=2&max-keys=1024&fetch-owner=false
 
+    next_pos = req.getURI().find("/", pos);
+    pos = next_pos + 1;
+    next_pos = req.getURI().find("/", pos);
+    args["Name"] = req.getURI().substr(pos, next_pos - pos);
+    pos = next_pos + 1;
+    
+    next_pos = req.getURI().find("?", pos);
+    //args["Name"] = req.getURI().substr(pos, next_pos - pos);
+    pos = next_pos + 1;    
+    
     do {
         next_pos = req.getURI().find("=", pos);
         if(next_pos == string::npos){
@@ -73,7 +81,7 @@ void ListObjectsV2::handleRequest(HTTPServerRequest &req, HTTPServerResponse &re
     
     struct dirent *pDirent;
     DIR *pDir;
-    string dir_path = dataPath + args["Name"];
+    string dir_path = dataPath + "/" + args["Name"] + "/";
     struct content {
         char name[FNAME_MAX];
         size_t size;
