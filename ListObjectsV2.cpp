@@ -15,12 +15,13 @@
 #include <sstream>
 #include <map>
 
+
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
-
+#include "TimeUtil.hpp"
 #include "ListObjectsV2.hpp"
 
 using namespace Poco::Net;
@@ -218,4 +219,7 @@ void ListObjectsV2::handleRequest(HTTPServerRequest &req, HTTPServerResponse &re
     outStream.write(xmlstream.str().c_str(), xmlstream.str().length());
     outStream.flush();
     free(contents);
+
+    cout << TimeUtil().Yellow() << TimeUtil().Now() << " Done " << TimeUtil().Reset();
+    cout << req.getURI() << endl;
 }

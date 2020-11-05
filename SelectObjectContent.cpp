@@ -26,8 +26,9 @@
 
 #include <sqlite3.h>
 #include <stdio.h>
-#include "SelectObjectContent.hpp"
 
+#include "SelectObjectContent.hpp"
+#include "TimeUtil.hpp"
 
 extern "C" {
 extern int sqlite3_csv_init(sqlite3 *db, char **pzErrMsg, const sqlite3_api_routines *pApi);
@@ -306,6 +307,9 @@ void SelectObjectContent::handleRequest(Poco::Net::HTTPServerRequest &req, Poco:
     outStream.flush();
 
     sqlite3_finalize(sqlRes);
-    sqlite3_close(db);    
+    sqlite3_close(db);
+   
+    cout << TimeUtil().Yellow() << TimeUtil().Now() << " Done " << TimeUtil().Reset();
+    cout << req.getURI() << endl;
 }
 
