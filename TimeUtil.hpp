@@ -4,6 +4,8 @@
 #include <chrono> 
 #include <ctime>
 #include <string>
+#include <sstream> 
+#include <iomanip>
 
 class TimeUtil{
     public:
@@ -15,17 +17,18 @@ class TimeUtil{
     }
 
     std::string Now(){
-        std::string now;
+        std::ostringstream now;
+        
         time_t curr_time;
 	    curr_time = time(NULL);
 	    tm *tm_local = localtime(&curr_time);
-        now = std::to_string(tm_local->tm_year - 100) + "/";
-        now.append(std::to_string(tm_local->tm_mon + 1) + "/");
-        now.append(std::to_string(tm_local->tm_mday) + " ");
-        now.append(std::to_string(tm_local->tm_hour) + ":");
-        now.append(std::to_string(tm_local->tm_min)  + ":");
-        now.append(std::to_string(tm_local->tm_sec));         
-        return now;
+        now << std::to_string(tm_local->tm_year - 100) << "/";
+        now << std::setw(2) << std::setfill('0') << std::to_string(tm_local->tm_mon + 1) << "/";
+        now << std::setw(2) << std::setfill('0') << std::to_string(tm_local->tm_mday) << " ";
+        now << std::setw(2) << std::setfill('0') << std::to_string(tm_local->tm_hour) << ":";
+        now << std::setw(2) << std::setfill('0') << std::to_string(tm_local->tm_min)  << ":";
+        now << std::setw(2) << std::setfill('0') << std::to_string(tm_local->tm_sec);         
+        return now.str();
     }
     
     std::string Reset() {
