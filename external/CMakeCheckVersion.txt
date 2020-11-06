@@ -1,0 +1,6 @@
+
+if(${CMAKE_VERSION} VERSION_LESS "3.13.0") 
+    message("OLD")
+else() 
+    message("OK")
+endif()
