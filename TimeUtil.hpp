@@ -47,6 +47,14 @@ class TimeUtil{
         std::string Yellow("\033[0;33m");
         return Yellow;
     }
+    std::string Blue() {
+        std::string Blue("\033[0;34m");
+        return Blue;
+    }
+    std::string Purple() {
+        std::string Purple("\033[0;35m");
+        return Purple;
+    } 
 };
 
 #endif /* TIME_UTIL_HPP */

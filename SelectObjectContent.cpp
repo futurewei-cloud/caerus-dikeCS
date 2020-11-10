@@ -87,6 +87,7 @@ class DikeByteBuffer
 
       m_Payload = ( uint8_t *)aws_event_stream_message_payload(&m_Msg);
       m_Pos = 0;
+      m_TotalBytes = 0;
     }
 
     ~DikeByteBuffer() {
@@ -97,6 +98,7 @@ class DikeByteBuffer
         if(m_Pos + len > DIKE_BYTE_BUFFER_SIZE){        
             UpdateCrc(&m_Msg, m_Pos);
             outStream.write((const char *)(m_Msg.message_buffer) , m_MsgLen + m_Pos);
+            m_TotalBytes += m_Pos;
             m_Pos = 0;
         }
         memcpy(m_Payload + m_Pos, buf, len); // This cost 0.8 sec
@@ -106,6 +108,7 @@ class DikeByteBuffer
     void Flush(ostream& outStream) {      
         UpdateCrc(&m_Msg, m_Pos);      
         outStream.write((const char *)(m_Msg.message_buffer), m_MsgLen + m_Pos);
+        m_TotalBytes += m_Pos;
         m_Pos = 0;
     }
 
@@ -165,6 +168,9 @@ class DikeByteBuffer
 
         return 0;
     }
+
+  public:
+    int m_TotalBytes;
 
   private:    
     int m_Pos;
@@ -310,6 +316,7 @@ void SelectObjectContent::handleRequest(Poco::Net::HTTPServerRequest &req, Poco:
     sqlite3_close(db);
    
     cout << TimeUtil().Yellow() << TimeUtil().Now() << " Done " << TimeUtil().Reset();
+    cout << TimeUtil().Red() << "Total bytes " << dbb.m_TotalBytes << " " << TimeUtil().Reset();
     cout << req.getURI() << endl;
 }
 
