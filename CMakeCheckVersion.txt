@@ -1,6 +1,9 @@
+function(OutMessage)
+  execute_process(COMMAND ${CMAKE_COMMAND} -E echo "${ARGN}")
+endfunction()
 
 if(${CMAKE_VERSION} VERSION_LESS "3.13.0") 
-    message("OLD")
+    OutMessage("OLD")
 else() 
-    message("OK")
+    OutMessage("OK")
 endif()
