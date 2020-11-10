@@ -12,8 +12,7 @@
 
 #include <iostream>
 
-#include "SelectObjectContent.hpp"
-#include "ListObjectsV2.hpp"
+#include "S3Handlers.hpp"
 #include "TimeUtil.hpp"
 
 using namespace Poco::Net;
@@ -31,6 +30,13 @@ public:
     if(string::npos != req.getURI().find("select&select-type=2")){
       return new SelectObjectContent;
     }
+    if(req.getMethod() == HTTPRequest::HTTP_PUT) {
+      return new PutObject;
+    }
+    
+    req.write(cout);
+    cout << endl;
+
     return NULL;
   }
 };

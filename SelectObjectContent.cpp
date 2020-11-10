@@ -27,7 +27,7 @@
 #include <sqlite3.h>
 #include <stdio.h>
 
-#include "SelectObjectContent.hpp"
+#include "S3Handlers.hpp"
 #include "TimeUtil.hpp"
 
 extern "C" {
