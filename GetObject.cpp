@@ -33,42 +33,52 @@ using namespace Poco::Util;
 using namespace Poco::XML;
 using namespace std;
 
-void PutObject::handleRequest(HTTPServerRequest &req, HTTPServerResponse &resp)
-{
-    istream& istr = req.stream();
+void GetObject::handleRequest(HTTPServerRequest &req, HTTPServerResponse &resp)
+{    
     string dataPath = "/data";
     string objectName = dataPath + req.getURI();
 
-    Poco::FileOutputStream ostr(objectName, std::ios::trunc);
+    Poco::FileInputStream istr(objectName, std::ios::in);
 
-    //Poco::StreamCopier::copyStream(istr, ostr);
-    string line;
-    while(std::getline(istr, line)){
-        if(string::npos == line.find(";chunk-signature=")){
-            ostr << line << "\n";
-        }
-    }
-    ostr.flush();
-    ostr.close();
-
-    resp.setStatus(HTTPResponse::HTTP_OK);
-    resp.setContentLength(0);
-    resp.setKeepAlive(true);
+    //ostream& ostr = resp.send();
+    //std::streamsize length = Poco::StreamCopier::copyStream(istr, ostr);
+    //ostr.flush();
     
-    /*    
+    resp.setStatus(HTTPResponse::HTTP_OK);    
+    resp.setKeepAlive(true);
+    //resp.setContentLength(length);
+    //resp.setContentLength(53);
+    resp.setChunkedTransferEncoding(true);
+    resp.setContentType("text/plain");
+    
+    /*
     resp.set("X-Xss-Protection", "1; mode=block");
     resp.set("Accept-Ranges", "bytes");
     resp.set("Content-Security-Policy", "block-all-mixed-content");
-    resp.set("ETag", "593373f70ed20e8e18ea9f2475979845");
+    resp.set("ETag", "d0d3e7f5b6d9cb76ab54d478fe379a1c");
     resp.set("Server", "dikeCS");
     resp.set("Vary", "Origin");
-    resp.set("X-Amz-Request-Id", "1645E415E0040DA6");
+    resp.set("X-Amz-Request-Id", "1646290C00F3B96E");    
+    */
+    /*
+    172.18.0.2 200 OK
+    172.18.0.2 Content-Security-Policy: block-all-mixed-content
+    172.18.0.2 Content-Type: text/plain
+    172.18.0.2 ETag: "d0d3e7f5b6d9cb76ab54d478fe379a1c"
+    172.18.0.2 Server: MinIO/DEVELOPMENT.2020-10-16T18-15-32Z
+    172.18.0.2 Vary: Origin
+    172.18.0.2 X-Amz-Request-Id: 1646290C00F3B96E
+    172.18.0.2 X-Xss-Protection: 1; mode=block
+    172.18.0.2 Accept-Ranges: bytes
+    172.18.0.2 Content-Length: 49
+    172.18.0.2 Last-Modified: Tue, 10 Nov 2020 13:37:28 GMT
     */
 
-    ostream& outStream = resp.send();
-    outStream.flush();
-
+    ostream& ostr = resp.send();
+    std::streamsize length = Poco::StreamCopier::copyStream(istr, ostr);
+    
     cout << TimeUtil().Yellow() << TimeUtil().Now() << " Done " << TimeUtil().Reset();
     cout << req.getURI() << endl;
-    //resp.write(cout);   
+    req.write(cout);
+    resp.write(cout);   
 }

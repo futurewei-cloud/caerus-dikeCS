@@ -33,7 +33,10 @@ public:
     if(req.getMethod() == HTTPRequest::HTTP_PUT) {
       return new PutObject;
     }
-    
+    if(req.getMethod() == HTTPRequest::HTTP_GET) {
+      return new GetObject;
+    }
+     
     req.write(cout);
     cout << endl;
 

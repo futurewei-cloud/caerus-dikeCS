@@ -45,6 +45,12 @@ void ListObjectsV2::handleRequest(HTTPServerRequest &req, HTTPServerResponse &re
 
     string dataPath = "/data";
 
+    char * env = getenv("DIKECS_DATA_PATH");
+    if(env != NULL){
+        dataPath = string(env);
+        cout << "dataPath set to " << dataPath << endl;
+    }    
+
     //cout << req.getURI() << endl;
     //  /tpch-test/?list-type=2&max-keys=1024&fetch-owner=false
 

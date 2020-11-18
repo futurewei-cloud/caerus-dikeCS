@@ -23,4 +23,10 @@ public:
    virtual ~PutObject() {};
 };
 
+class GetObject : public Poco::Net::HTTPRequestHandler {
+public:  
+   virtual void handleRequest(Poco::Net::HTTPServerRequest &req, Poco::Net::HTTPServerResponse &resp);
+   virtual ~GetObject() {};
+};
+
 #endif /* S3_HANDLERS_HPP */

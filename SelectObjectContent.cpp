@@ -217,6 +217,12 @@ void SelectObjectContent::handleRequest(Poco::Net::HTTPServerRequest &req, Poco:
     }
 
     string dataPath = "/data";
+    char * env = getenv("DIKECS_DATA_PATH");
+    if(env != NULL){
+        dataPath = string(env);
+        cout << "dataPath set to " << dataPath << endl;
+    }    
+
     string uri = req.getURI();
     size_t pos = uri.find("%2F");
     if(pos != string::npos){
