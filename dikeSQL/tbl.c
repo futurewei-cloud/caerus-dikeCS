@@ -922,6 +922,8 @@ static int tbltabNext(sqlite3_vtab_cursor *cur){
   CsvTable *pTab = (CsvTable*)cur->pVtab;
   int i = 0;
   char *z;
+
+  #if 1
   int rc;
 
   /* Evaluate if we can use inplace pointers */ 
@@ -934,6 +936,7 @@ static int tbltabNext(sqlite3_vtab_cursor *cur){
   for(i = 0; i < pTab->nCol; i++){
     pCur->azPtr[i] = 0;
   }
+  #endif
 
   i = 0;
 
@@ -991,7 +994,7 @@ static int tbltabColumn(
         //sqlite3_result_int(ctx, atoi(pCur->azPtr[i]));
         //sqlite3_result_text(ctx, pCur->azPtr[i], -1 , SQLITE_STATIC);
       } else {      
-        sqlite3_result_text(ctx, pCur->azPtr[i], -1 , SQLITE_STATIC);
+        sqlite3_result_text(ctx, pCur->azPtr[i], -1 , SQLITE_TRANSIENT);
       }      
     } else if (pCur->azVal[i]!=0){
       if(pTab->cTypes[i]== SQLITE_AFF_INTEGER){
@@ -1060,6 +1063,7 @@ static int tbltabFilter(
     pCur->rdr.nIn = 0;
     pthread_mutex_unlock(&pCur->rdr.lock);
     */
+   //printf("%s idxNum %d idxStr %s\n", __FUNCTION__, idxNum, idxStr);
   }
   return tbltabNext(pVtabCursor);
 }
