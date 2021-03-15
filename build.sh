@@ -1,16 +1,11 @@
 #!/bin/bash
+set -e
 
-BUILD_TYPE=Release
+git submodule init
+git submodule update --recursive --progress
 
-if [[ $(cmake -P CMakeCheckVersion.txt) == "OK" ]];
-then
-    cmake -D CMAKE_BUILD_TYPE=${BUILD_TYPE} -S . -B build/${BUILD_TYPE}
-    cmake --build ./build/${BUILD_TYPE}
-else
-    mkdir -p build/${BUILD_TYPE}
-    cd build/${BUILD_TYPE}
-    cmake -D CMAKE_BUILD_TYPE=${BUILD_TYPE} ../..
-    make
-    cd ../../
-fi
+cd external
+./build_aws.sh || (echo "*** build_aws build failed with $?" ; exit 1)
+cd ..
+./build_server.sh || (echo "*** dikeCS build failed with $?" ; exit 1)
 
