@@ -3,7 +3,7 @@
 docker run -it --rm  \
 -p 9000:9000 \
 -v "$(pwd)/build/Release/"://usr/local/bin \
--v "$(pwd)/../minio/data":/data \
+-v "$(pwd)/../data":/data \
 --network dike-net \
 --name minioserver \
 ubuntu:20.04 dikeCS
