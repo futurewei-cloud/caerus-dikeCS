@@ -1,6 +1,6 @@
 #! /bin/bash
 
-./stop.sh
+#./stop.sh
 docker run -d --rm  \
 -p 9000:9000 \
 -v "$(pwd)/build/Release/"://usr/local/bin \
